@@ -85,7 +85,7 @@ void motor_init()
     for (size_t i = 0; i < 4; ++i)
         Escs[i].attach(MortorPins[i], minValue, maxValue);
 
-    for (Servo &const Esc : Escs)
+    for (Servo& Esc : Escs)
         Esc.writeMicroseconds(1000);
 }
 
