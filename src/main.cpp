@@ -1,103 +1,70 @@
-#include <Arduino.h>
-#include <Servo.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include "I2Cdev.h"
-#include "MPU9250_9Axis_MotionApps41.h"
+/* #include <Arduino.h>
+#include <Servo.h> */
+#include "MYDroneControl.h"
 
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    #include "Wire.h"
-#endif
+// 쓰로틀은 1083이 최솟값
+volatile size_t ThrottlePulseWidth = 1083;
+volatile size_t RollPulseWidth = 1500;
+volatile size_t PitchPulseWidth = 1529;
+volatile size_t YawPulseWidth = 1504;
 
-#define OUTPUT_READABLE_YAWPITCHROLL
-#define OUTPUT_TEAPOT
-
-#define INTERRUPT_PIN 2 // use pin 2 on Arduino Uno & most boards
-
-#define MPU9250_IMU_ADDRESS 0x68
-
-/**
- * @brief Information about the Servo.h library functions:
- * 
- * - servo.writeMicroseconds(us):  
- *   Sets the servo pulse width in microseconds.  
- *   @param us: Pulse width in microseconds (int).
- * 
- * - servo.attach(pin):  
- *   Attaches the servo to the specified pin.  
- *   @param pin: The pin to which the servo is connected.  
- * 
- * - servo.attach(pin, min, max):  
- *   Attaches the servo to the specified pin and defines the pulse width range.  
- *   @param pin: The pin to which the servo is connected.  
- *   @param min: Minimum pulse width in microseconds (default is 544).  
- *   @param max: Maximum pulse width in microseconds (default is 2400).  
- */
-
-/**
- * @brief Pin usage on Teensy 4.1 for the current configuration:
- * 
- * - ESC (PWM pins): {9, 10, 11, 12}  
- * - Receiver (PWM pins): {3, 4, 5, 6}  
- */
-
-
-// Define the esc objects
-Servo Escs[4];
-
-// Enum class to represent the motor Locations
-enum class MotorLocation
-{
-    FrontLeftPin = 9,
-    FrontRightPin,
-    BackLeftPin,
-    BackRightPin
-};
-
-const int MortorPins[] = {
-    static_cast<int>(MotorLocation::FrontLeftPin),
-    static_cast<int>(MotorLocation::FrontRightPin),
-    static_cast<int>(MotorLocation::BackLeftPin),
-    static_cast<int>(MotorLocation::BackRightPin)};
-
-// Enum class to represent the UAV contorl axes
-enum class UAVControl
-{
-    ThrottlePin = 3,
-    RollPin,
-    PitchPin,
-    YawPin
-};
-
-// Define constants
-const int baudRate = 115200;
-const int minValue = 1000;
-const int maxValue = 1800;
-
-// Define the functions
-
-void motor_init()
-{
-    // Syncronize with Serial to baudRate
-    Serial.begin(baudRate);
-
-    // Attach the pins to the esc objects
-    for (size_t i = 0; i < 4; ++i)
-        Escs[i].attach(MortorPins[i], minValue, maxValue);
-
-    for (Servo& Esc : Escs)
-        Esc.writeMicroseconds(1000);
-}
-
-//hi
-// Setup Function block
-void setup()
-{
+void setup() {
     motor_init();
-
 }
 
-// Loop Function block
-void loop()
-{
+void loop() {
+    // Map the pulse widths to a range of -200 to 200, with 0 being the center value
+    int Throttle = map(ThrottlePulseWidth, minThrottle, maxThrottle, 1000, 1500);
+    int Roll = map(RollPulseWidth, minRoll, maxRoll, -200, 200);
+    int Pitch = map(PitchPulseWidth, minPitch, maxPitch, -200, 200);
+    int Yaw = map(YawPulseWidth, minYaw, maxYaw, -200, 200);
+
+    // Print the mapped values to see how close they are to 0 (center value)
+    Serial.print("Mapped Throttle: ");
+    Serial.println(Throttle);
+    Serial.print("Mapped Roll: ");
+    Serial.println(Roll);
+    Serial.print("Mapped Pitch: ");
+    Serial.println(Pitch);
+    Serial.print("Mapped Yaw: ");
+    Serial.println(Yaw);
+    Serial.println();
+
+    // Check if the values are centered (close to 0)
+    if (abs(Roll) < 10) {
+        Serial.println("Roll is centered");
+    }
+    if (abs(Pitch) < 10) {
+        Serial.println("Pitch is centered");
+    }
+    if (abs(Yaw) < 10) {
+        Serial.println("Yaw is centered");
+    }
+
+    int MotorFrontLeft = Throttle + Roll + Pitch + Yaw;
+    int MotorFrontRight = Throttle - Roll + Pitch - Yaw;
+    int MotorBackLeft = Throttle + Roll - Pitch - Yaw;
+    int MotorBackRight = Throttle - Roll - Pitch + Yaw;
+
+    MotorFrontLeft = constrain(MotorFrontLeft, minValue, maxValue);
+    MotorFrontRight = constrain(MotorFrontRight, minValue, maxValue);
+    MotorBackLeft = constrain(MotorBackLeft, minValue, maxValue);
+    MotorBackRight = constrain(MotorBackRight, minValue, maxValue);
+
+    // Write motor speeds to ESCs
+    ESCFrontLeft.writeMicroseconds(MotorFrontLeft);
+    ESCFrontRight.writeMicroseconds(MotorFrontRight);
+    ESCBackLeft.writeMicroseconds(MotorBackLeft);
+    ESCBackRight.writeMicroseconds(MotorBackRight);
+
+    Serial.print("FrontLeft Motor PWM: ");
+    Serial.println(MotorFrontLeft);
+    Serial.print("FrontRight Motor PWM: ");
+    Serial.println(MotorFrontRight);
+    Serial.print("BackLeft Motor PWM: ");
+    Serial.println(MotorBackLeft);
+    Serial.print("BackRight Motor PWM: ");
+    Serial.println(MotorBackRight);
+
+    delay(1000);  // Delay for readability
 }
