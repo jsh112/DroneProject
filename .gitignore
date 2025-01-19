@@ -32,5 +32,7 @@
 *.app
 >>>>>>> 10f54e02675ac25fae278074abb381fea7b59613
 
+# directories
 .pio/
 .vscode/
+dev/
