@@ -1,5 +1,6 @@
-#ifndef MYDRONECONTROL_H
-#define MYDRONECONTROL_H
+#pragma once
+#ifndef DRONECONTROL_HPP
+#define DRONECONTROL_HPP
 
 #include <Arduino.h>
 #include <Servo.h>
@@ -74,4 +75,4 @@ void motor_init(void);
 // void ReceiverCalibration(void);
 // void ControlDrone(void);
 
-#endif // MYDRONECONTROL_H
+#endif // DRONECONTROL_HPP
