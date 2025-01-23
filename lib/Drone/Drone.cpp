@@ -13,19 +13,6 @@ Drone::Drone() :
     ESCBackRight.attach(Motor::BACK_RIGHT, minValue, maxValue);
 }
 
-void Drone::attachReceiverInterrupts()
-{
-    pinMode(PIN_THROTTLE, INPUT);
-    pinMode(PIN_ROLL, INPUT);
-    pinMode(PIN_PITCH, INPUT);
-    pinMode(PIN_YAW, INPUT);
-
-    attachInterrupt(digitalPinToInterrupt(PIN_THROTTLE), ThrottleISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(PIN_ROLL), RollISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(PIN_PITCH), PitchISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(PIN_YAW), YawISR, CHANGE);
-}
-
 // setter
 void Drone::setThrottlePulseWidth(size_t pw){
     ThrottlePW = pw;
@@ -42,16 +29,16 @@ void Drone::setYawPulseWidth(size_t pw){
 
 // getter
 int Drone::getThrottlePulseWidth(){
-    return ThrottlePW;
+    return this->ThrottlePW;
 }
 int Drone::getRollPulseWidth(){
-    return RollPW;
+    return this->RollPW;
 }
 int Drone::getPitchPulseWidth(){
-    return PitchPW;
+    return this->PitchPW;
 }
 int Drone::getYawPulseWidth(){
-    return YawPW;
+    return this->YawPW;
 }
 
 // ISR Functions

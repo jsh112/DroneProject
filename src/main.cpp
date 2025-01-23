@@ -11,7 +11,15 @@ Drone drone;
 void setup() {
     Serial.begin(baudRate);
     while(!Serial);
-    drone.attachReceiverInterrupts();
+    pinMode(drone.PIN_THROTTLE, INPUT);
+    pinMode(drone.PIN_ROLL, INPUT);
+    pinMode(drone.PIN_PITCH, INPUT);
+    pinMode(drone.PIN_YAW, INPUT);
+
+    attachInterrupt(digitalPinToInterrupt(drone.PIN_THROTTLE), drone.ThrottleISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(drone.PIN_ROLL), drone.RollISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(drone.PIN_PITCH), drone.PitchISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(drone.PIN_YAW), drone.YawISR, CHANGE);
 }
 
 // ================================================================

@@ -40,7 +40,6 @@ public:
     static void RollISR();
     static void PitchISR();
     static void YawISR();
-    void attachReceiverInterrupts();
 
     // Getter and Setter
     static void setThrottlePulseWidth(size_t pw);
