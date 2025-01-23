@@ -1,36 +1,45 @@
-/* #include <Arduino.h>
-#include <Servo.h> */
-#include "DroneControl.hpp"
+#include <Arduino.h>
+#include "Drone.hpp"
 
-// 쓰로틀은 1083이 최솟값
-volatile size_t ThrottlePulseWidth = 1083;
-volatile size_t RollPulseWidth = 1500;
-volatile size_t PitchPulseWidth = 1529;
-volatile size_t YawPulseWidth = 1504;
+// Declare Drone Class
+Drone drone;
+
+// ================================================================
+// ===                    MAIN PROGRAM SETUP                    ===
+// ================================================================
 
 void setup() {
-    motor_init();
+    Serial.begin(baudRate);
+    while(!Serial);
+    drone.attachReceiverInterrupts();
 }
 
+// ================================================================
+// ===                    MAIN PROGRAM LOOP                     ===
+// ================================================================
+
 void loop() {
-    // Map the pulse widths to a range of -200 to 200, with 0 being the center value
-    int Throttle = map(ThrottlePulseWidth, minThrottle, maxThrottle, 1000, 1500);
-    int Roll = map(RollPulseWidth, minRoll, maxRoll, -200, 200);
-    int Pitch = map(PitchPulseWidth, minPitch, maxPitch, -200, 200);
-    int Yaw = map(YawPulseWidth, minYaw, maxYaw, -200, 200);
-
-    // Print the mapped values to see how close they are to 0 (center value)
-    Serial.print("Mapped Throttle: ");
-    Serial.println(Throttle);
+    /* Serial.print("Mapped Throttle: ");
+    Serial.println(throttle);
     Serial.print("Mapped Roll: ");
-    Serial.println(Roll);
+    Serial.println(roll);
     Serial.print("Mapped Pitch: ");
-    Serial.println(Pitch);
+    Serial.println(pitch);
     Serial.print("Mapped Yaw: ");
-    Serial.println(Yaw);
-    Serial.println();
+    Serial.println(yaw);
+    Serial.println(); */
 
-    // Check if the values are centered (close to 0)
+    int Throttle = drone.getThrottlePulseWidth();
+    int Roll = drone.getRollPulseWidth();
+    int Pitch = drone.getPitchPulseWidth();
+    int Yaw = drone.getYawPulseWidth();
+
+    Throttle = map(Throttle, minThrottle, maxThrottle, 1000, 1500);
+    Roll = map(Roll, minRoll, maxRoll, -200, 200);
+    Pitch = map(Pitch, minPitch, maxPitch, -200, 200);
+    Yaw = map(Yaw, minYaw, maxYaw, -200, 200);
+
+    // Estimate the pose centered
     if (abs(Roll) < 10) {
         Serial.println("Roll is centered");
     }
@@ -52,10 +61,7 @@ void loop() {
     MotorBackRight = constrain(MotorBackRight, minValue, maxValue);
 
     // Write motor speeds to ESCs
-    ESCFrontLeft.writeMicroseconds(MotorFrontLeft);
-    ESCFrontRight.writeMicroseconds(MotorFrontRight);
-    ESCBackLeft.writeMicroseconds(MotorBackLeft);
-    ESCBackRight.writeMicroseconds(MotorBackRight);
+    drone.updateMotorPulseWidth(MotorFrontLeft, MotorFrontRight, MotorBackLeft, MotorBackRight);
 
     Serial.print("FrontLeft Motor PWM: ");
     Serial.println(MotorFrontLeft);
@@ -68,3 +74,5 @@ void loop() {
 
     delay(1000);  // Delay for readability
 }
+
+// 드디어 성공

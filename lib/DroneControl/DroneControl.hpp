@@ -43,7 +43,7 @@ extern volatile size_t YawPulseWidth;
 
 const int baudRate = 115200;
 const int minValue = 1000;
-const int maxValue = 1400;
+const int maxValue = 1600;
 
 // Minimum and maximum pulse widths for each channel (adjust these based on calibration)
 const int minThrottle = 1084;
@@ -64,6 +64,7 @@ const int maxYaw = 1919;
  */
 /**
  * @brief hyperparameters of ISR functions
+ * @param
  */
 
 void Throttle_ISR(void);
