@@ -60,9 +60,6 @@ void loop() {
     MotorBackLeft = constrain(MotorBackLeft, minValue, maxValue);
     MotorBackRight = constrain(MotorBackRight, minValue, maxValue);
 
-    // Write motor speeds to ESCs
-    drone.updateMotorPulseWidth(MotorFrontLeft, MotorFrontRight, MotorBackLeft, MotorBackRight);
-
     Serial.print("FrontLeft Motor PWM: ");
     Serial.println(MotorFrontLeft);
     Serial.print("FrontRight Motor PWM: ");
@@ -71,6 +68,9 @@ void loop() {
     Serial.println(MotorBackLeft);
     Serial.print("BackRight Motor PWM: ");
     Serial.println(MotorBackRight);
+    // Write motor speeds to ESCs
+    drone.updateMotorPulseWidth(MotorFrontLeft, MotorFrontRight, MotorBackLeft, MotorBackRight);
+
 
     delay(1000);  // Delay for readability
 }
