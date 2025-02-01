@@ -9,8 +9,11 @@ Drone drone;
 // ================================================================
 
 void setup() {
-    Serial.begin(baudRate);
-    while(!Serial);
+    Serial.begin(115200);
+    Serial.println("dfsfsd");
+    // while(!Serial);
+    if (!Serial) {Serial.print("sssssssssssss");}
+    Serial.println("dfsfsd");
     pinMode(drone.PIN_THROTTLE, INPUT);
     pinMode(drone.PIN_ROLL, INPUT);
     pinMode(drone.PIN_PITCH, INPUT);
@@ -80,7 +83,7 @@ void loop() {
     drone.updateMotorPulseWidth(MotorFrontLeft, MotorFrontRight, MotorBackLeft, MotorBackRight);
 
 
-    delay(1000);  // Delay for readability
+    delay(30);  // Delay for readability
 }
 
 // 드디어 성공

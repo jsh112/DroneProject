@@ -5,8 +5,8 @@ volatile size_t Drone::RollPW = 1500;
 volatile size_t Drone::PitchPW = 1529;
 volatile size_t Drone::YawPW = 1504;
 
-Drone::Drone() : 
-    ESCFrontLeft(), ESCFrontRight(), ESCBackLeft(), ESCBackRight() {
+Drone::Drone() : ESCFrontLeft(), ESCFrontRight(), ESCBackLeft(), ESCBackRight()
+{
     ESCFrontLeft.attach(Motor::FRONT_LEFT, minValue, maxValue);
     ESCFrontRight.attach(Motor::FRONT_RIGHT, minValue, maxValue);
     ESCBackLeft.attach(Motor::BACK_LEFT, minValue, maxValue);
@@ -14,32 +14,39 @@ Drone::Drone() :
 }
 
 // setter
-void Drone::setThrottlePulseWidth(size_t pw){
+void Drone::setPulseWidth(volatile size_t &pw, size_t value) {pw =}
+
+void Drone::setThrottlePulseWidth(size_t pw)
+{
     ThrottlePW = pw;
 }
-void Drone::setRollPulseWidth(size_t pw){
+void Drone::setRollPulseWidth(size_t pw)
+{
     RollPW = pw;
 }
-void Drone::setPitchPulseWidth(size_t pw){
+void Drone::setPitchPulseWidth(size_t pw)
+{
     PitchPW = pw;
 }
-void Drone::setYawPulseWidth(size_t pw){
+void Drone::setYawPulseWidth(size_t pw)
+{
     YawPW = pw;
 }
 
 // getter
-int Drone::getThrottlePulseWidth(){
-    return this->ThrottlePW;
+template <volatile size_t &PW>
+int Drone::getPulseWidth()
+{
+    noInterrupts();
+    int PulseWidth = PW;
+    interrupts();
+    return PulseWidth;
 }
-int Drone::getRollPulseWidth(){
-    return this->RollPW;
-}
-int Drone::getPitchPulseWidth(){
-    return this->PitchPW;
-}
-int Drone::getYawPulseWidth(){
-    return this->YawPW;
-}
+
+int Drone::getThrottlePulseWidth() { return getPulseWidth<ThrottlePW>(); }
+int Drone::getRollPulseWidth() { return getPulseWidth<RollPW>(); }
+int Drone::getPitchPulseWidth() { return getPulseWidth<PitchPW>(); }
+int Drone::getYawPulseWidth() { return getPulseWidth<YawPW>(); }
 
 // ISR Functions
 void Drone::ThrottleISR()
@@ -91,14 +98,15 @@ void Drone::YawISR()
     }
 }
 
-void Drone::updateMotorPulseWidth(int& fl, int& fr, int& bl, int& br){
-    this->setMotorSignal(this->ESCFrontLeft, fl);
-    this->setMotorSignal(this->ESCFrontRight, fr);
-    this->setMotorSignal(this->ESCBackLeft, bl);
-    this->setMotorSignal(this->ESCBackRight, br);
+void Drone::updateMotorPulseWidth(int &fl, int &fr, int &bl, int &br)
+{
+    setMotorSignal(ESCFrontLeft, fl);
+    setMotorSignal(ESCFrontRight, fr);
+    setMotorSignal(ESCBackLeft, bl);
+    setMotorSignal(ESCBackRight, br);
 }
 
-
-void Drone::setMotorSignal(Servo& servo, int& MotorSig){
+void Drone::setMotorSignal(Servo &servo, int &MotorSig)
+{
     servo.writeMicroseconds(MotorSig);
 }

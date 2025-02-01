@@ -42,6 +42,10 @@ public:
     static void YawISR();
 
     // Getter and Setter
+    template <volatile size_t& PW>
+    static int getPulseWidth();
+
+    void setPulseWidth(volatile size_t &pw, size_t value);
     static void setThrottlePulseWidth(size_t pw);
     static void setRollPulseWidth(size_t pw);
     static void setPitchPulseWidth(size_t pw);
